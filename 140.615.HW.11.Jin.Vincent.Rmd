@@ -1,0 +1,42 @@
+---
+title: "140.615.HW.11.Jin.Vincent"
+author: "Vincent Jin"
+date: "2023-05-03"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 11
+## Vincent Jin
+
+``` {r}
+library(SPH.140.615)
+copper <- copper
+```
+
+# 1.
+The percent transmittance for a sample with unknown copper concentration was measured to be 35.6%. Use your fitted calibration line from the previous homework to estimate the copper concentration in this sample. Calculate a 95% confidence interval for the copper concentration in this sample. Make a figure (including the calibration line) that visualizes your results.
+
+***Answer***
+
+``` {r}
+# regression line from previos homework
+lm.fit <- lm(log10(response)~concentration, data = copper)
+
+# Calibration
+calibrate(copper$concentration, log10(copper$response), log10(35.6))
+
+# Visualization
+xx <- seq(1, 50, by = 0.1)
+predict.new <- predict(lm.fit, data.frame(concentration=xx), interval="prediction")
+predict.mean <- predict(lm.fit, data.frame(concentration=xx), interval="confidence")
+plot(copper$concentration, log10(copper$response), xlab="x", ylab="y", ylim=range(predict.new), col="lightgrey")
+lines(xx, predict.mean[,1], lwd=2)
+lines(xx, predict.mean[,2], lty=2)
+lines(xx, predict.mean[,3], lty=2)
+lines(xx, predict.new[,2], lty=2, col="blue")
+lines(xx, predict.new[,3], lty=2, col="blue")
+```
