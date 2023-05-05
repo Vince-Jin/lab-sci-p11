@@ -33,10 +33,116 @@ calibrate(copper$concentration, log10(copper$response), log10(35.6))
 xx <- seq(1, 50, by = 0.1)
 predict.new <- predict(lm.fit, data.frame(concentration=xx), interval="prediction")
 predict.mean <- predict(lm.fit, data.frame(concentration=xx), interval="confidence")
-plot(copper$concentration, log10(copper$response), xlab="x", ylab="y", ylim=range(predict.new), col="lightgrey")
+plot(copper$concentration, log10(copper$response), xlab="concentration", ylab="log10(response)", ylim=range(predict.new), col="lightgrey")
 lines(xx, predict.mean[,1], lwd=2)
 lines(xx, predict.mean[,2], lty=2)
 lines(xx, predict.mean[,3], lty=2)
 lines(xx, predict.new[,2], lty=2, col="blue")
 lines(xx, predict.new[,3], lty=2, col="blue")
 ```
+
+The copper concentration in this sample may be 21.82 with a confidence interval (19.48, 24.17).
+
+# 2.
+The data for this problem are in the dat.xy data frame in the SPH.140.615 package. Here, X is the predictor, and Y is the response.
+
+## (a)
+Fit a regression line using the function lm, and provide estimates for the intercept $\beta_0$, the slope $\beta_1$, and the residual standard deviation $\sigma$.
+
+***Answer***
+
+``` {r}
+xy <- dat.xy
+lm.fit <- lm(Y ~ X, data = xy)
+summary(lm.fit)
+```
+
+The $\beta_0$ is -227.31 and $\beta_1$ is 14.10. The residual standard deviation $\sigma$ is 80.88.
+
+## (b)
+Provide 95% confidence intervals for $\beta_0$ and $\beta_1$.
+
+***Answer***
+
+``` {r}
+confint(lm.fit)
+```
+
+The confidence intervals for $\beta_0$ is (-472.60, 17.99), and for $\beta_1$ is (9.82, 18.38)
+
+## (c)
+Plot the data, and show the regression line.
+
+***Answer***
+
+``` {r}
+plot(xy$X, xy$Y, xlab="X", ylab="Y")
+abline(lm(xy$Y ~ xy$X), col="blue", lty=2)
+```
+
+## (d)
+What is the expected response for X = 60? What is the expected response for X = 70? Provide 95% confidence intervals using the function predict.
+
+***Answer***
+
+``` {r}
+predict(lm.fit, data.frame(X = c(60, 70)), interval = "confidence")
+```
+
+The expected response for X = 60 was 618.60 with a confidence interval of (591.88, 645.31) and for X = 70 was 759.58 with a confidence (699.30, 819.86).
+
+## (e)
+For both X = 60 and X = 70, also provide 95% prediction intervals.
+
+***Answer***
+
+``` {r}
+predict(lm.fit, data.frame(X = c(60, 70)), interval = "prediction")
+```
+
+For X = 60 and 70 the prediction intervals are:  (453.615,783.578),  (585.974, 933.187) respectively.
+
+## (f)
+Comment on the lengths of the four intervals.
+
+***Answer***
+
+The prediction interval seems to be wider than the 95% confidence interval.
+
+#3.
+The data for this problem are in the fev data frame in the SPH.140.615 package. The response is a measure of lung function (FEV, in liters). The other variables are the gender of a subject (male/female), the height (in inches), and whether or not that person is a smoker (yes/no). Analyze the data using linear regression (note: there are no interactions in these data, so you don’t need to worry about them), and report your findings. In particular:
+
+## (a)
+Explore the data by plotting them in a meaningful way, and comment.
+
+***Answer***
+
+``` {r}
+lm.outA <- lm(fev ~ height, data=fev, subset=(gender == 'M' & smoking == 'N'))
+lm.outB <- lm(fev ~ height, data=fev, subset=(gender == 'M' & smoking == 'Y'))
+lm.outC <- lm(fev ~ height, data=fev, subset=(gender == 'F' & smoking == 'N'))
+lm.outD <- lm(fev ~ height, data=fev, subset=(gender == 'F' & smoking == 'Y'))
+par(las=1)
+plot(fev ~ height, data=fev, type="n", xlab="height", ylab="fev")
+points(fev ~ height, data=fev, subset=(gender == 'M' & smoking == 'N'), col="blue", lwd=2)
+points(fev ~ height, data=fev, subset=(gender == 'M' & smoking == 'Y'), col="green", lwd=2)
+points(fev ~ height, data=fev, subset=(gender == 'F' & smoking == 'N'), col="red", lwd=2)
+points(fev ~ height, data=fev, subset=(gender == 'F' & smoking == 'Y'), col="purple", lwd=2)
+abline(lm.outA$coef, col="blue", lty=2, lwd=2)
+abline(lm.outB$coef, col="green", lty=2, lwd=2)
+abline(lm.outC$coef, col="red", lty=2, lwd=2)
+abline(lm.outD$coef, col="purple", lty=2, lwd=2)
+
+plot(fev)
+```
+
+## (b)
+Fit your statistical models, and select the parameters for your final model.
+
+``` {r}
+lm.A <- lm(fev ~ gender + height + smoking, data = fev)
+```
+
+
+
+
