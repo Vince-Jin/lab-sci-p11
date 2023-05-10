@@ -39,6 +39,16 @@ lines(xx, predict.mean[,2], lty=2)
 lines(xx, predict.mean[,3], lty=2)
 lines(xx, predict.new[,2], lty=2, col="blue")
 lines(xx, predict.new[,3], lty=2, col="blue")
+
+# Visualization 2
+plot(copper$concentration, log10(copper$response), xlab="concentration", ylab="response")
+abline(lm.fit, col = "blue")
+points(x = 21.82, y = log10(35.6), col = "red", pch = 16)
+arrows(x0 = 21.82, y0 = log10(35.6), x1 = 21.82, y1 = 0, lty = 1, col = "red")
+arrows(x0 = 0, y0 = log10(35.6), x1 = 21.82, y1 = log10(35.6), lty = 1, col = "red")
+segments(x0 = 19.48, y0 = 1.0, x1 = 24.17, y1 = 1.0, col = "orange")
+arrows(x0 = 19.48, y0 = 1.0, x1 = 19.48, y1 = 0, col = "orange")
+arrows(x0 = 24.17, y0 = 1.0, x1 = 24.17, y1 = 0, col = "orange")
 ```
 
 The copper concentration in this sample may be 21.82 with a confidence interval (19.48, 24.17).
@@ -134,15 +144,65 @@ abline(lm.outC$coef, col="red", lty=2, lwd=2)
 abline(lm.outD$coef, col="purple", lty=2, lwd=2)
 
 plot(fev)
+
+plot(fev ~ height, data = fev)
+plot(fev ~ gender, data = fev)
+plot(fev ~ smoking, data = fev)
 ```
+
+Based on plots, we can see that there seems to be positive relationship between height and fev and gender and fev, and negative relationship between smoking and fev. Overall, the fev scores for male and female, smoker and smokers were overlapping with each other. Regardless the gender and smoking status combination, fev increases as height increases.
 
 ## (b)
 Fit your statistical models, and select the parameters for your final model.
 
 ``` {r}
-lm.A <- lm(fev ~ gender + height + smoking, data = fev)
+lm.full <- lm(fev ~ gender + height + smoking, data = fev)
+summary(lm.full)
+lm.reduced <- lm(fev ~ height + smoking, data = fev)
+summary(lm.reduced)
+anova(lm.full, lm.reduced)
 ```
 
+***Answer***
 
+My final model is:
+$fev = \beta_0 + \beta_1 * height + \beta_2 * smoking$, where $\beta_1 = 0.12$ and $\beta_2 = -0.11$. Parameters selected are height and smoking. Gender was not selected as the coefficient in the full model was not significant, and also when testing the full model and reduced model, the p-value of 0.85 suggested that the coefficient for gender was not significantly different from 0.
+
+## (c)
+Make a qq-plot of the residuals. Do they look normal?
+
+``` {r}
+qqnorm(lm.reduced$residuals)
+qqline(lm.reduced$residuals)
+```
+
+***Answer***
+
+The qq-plot suggested that the residuals are normal.
+
+## (d)
+Report your findings, and give an interpretation of the parameter estimates for the variables that you used in your final model.
+
+***Answer***
+
+Based on the analysis, the model I fitted was:
+$fev = -5.27 + 0.12 * height - 0.11 * smoking$
+Parameters selected in this final model are height and smoking. Gender was not selected as the coefficient in the full model was not significant, and also when testing the full model and reduced model, the p-value of 0.85 suggested that the coefficient for gender was not significantly different from 0.
+
+Therefore we can interpret the parameter estimates is that:
+$\beta_0$: The expected measure of lung function in the form of FEV in liters among non-smokers who has a height of 0 inch is -5.27. However, the interpretation for $\beta_0$ is not much meaningful without centering for height as people always have some heights.
+$\beta_1$: The expected measure of lung function in the form of FEV in liters will increase 0.12 for every 1 inch increase in height, adjusting for smoking status (or holding the smoking status the same).
+$\beta_2$: The expected measure of lung function in the form of FEV in liters for smokers is 0.11 less than the lung function in the form of FEV in liters for non-smoker, adjusting for height of the person.
+
+## (e)
+How much of the variability in FEV can you explain with your predictors?
+
+``` {r}
+summary(lm.reduced)$r.squared
+```
+
+***Answer***
+
+47.62% (0.4762 * 100%) of the variability in FEV can be explained with our predictors.
 
 
